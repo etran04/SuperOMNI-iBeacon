@@ -4,7 +4,7 @@ Integrate iBeacons with HKWireless SDK in order to ultimately create "Follow Me 
 WORK IN PROGRESS
 ---------------
 
-(Written in Objective C in this moment of time)
+(Written in Objective C in this moment in time)
 
 Terms used: 
 SuperOmni - Omni 10 with embedded iBeacon (courtesy of Kevin) 
