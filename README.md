@@ -7,7 +7,7 @@ WORK IN PROGRESS
 (Written in Objective C in this moment in time)
 
 Terms used: 
-<br>SuperOmni - Omni 10 with embedded iBeacon (courtesy of Kevin) 
+<br>SuperOmni - Omni 10 with embedded iBeacon
 <br>SmartThings - Omni 20 near my desk with an Gimbal iBeacon near it 
 
 Currently the functionality of this application are:
