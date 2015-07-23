@@ -15,6 +15,6 @@ Currently the functionality of this application are:
 <br> 2) When 'Far', volume of associated speaker will drop to 0. 
 
 Currently implementing and working on:
-1) Linear Interpolation Algorithm - Smoothing out the gathered RSSI values from a set 
+<br>1) Linear Interpolation Algorithm - Smoothing out the gathered RSSI values from a set 
   and using that as a more accurate date value to adjust the volume of the speaker accordingly.
-2) Figuring out what initial volume would be best to start at.
+<br>2) Figuring out what initial volume would be best to start at.
