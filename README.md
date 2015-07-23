@@ -11,8 +11,8 @@ SuperOmni - Omni 10 with embedded iBeacon (courtesy of Kevin)
 SmartThings - Omni 20 near my desk with an Gimbal iBeacon near it 
 
 Currently the functionality of this application are:
-1) Able to start wake up from sleep and start playing music when in 'Near' or 'Immediate' vicinity of either speakers. 
-2) When 'Far', volume of associated speaker will drop to 0. 
+<br> 1) Able to start wake up from sleep and start playing music when in 'Near' or 'Immediate' vicinity of either speakers. 
+<br> 2) When 'Far', volume of associated speaker will drop to 0. 
 
 Currently implementing and working on:
 1) Linear Interpolation Algorithm - Smoothing out the gathered RSSI values from a set 
