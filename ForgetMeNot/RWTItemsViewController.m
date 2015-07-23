@@ -246,7 +246,20 @@ NSString * const kRWTStoredItemsKey = @"storedItems";
 
 
 /* Linear interpolation helper method between two points */
-- (void) lerp {
+- (void) interpolationStarting: (double) start
+                   endingIndex: (double) end
+                  countOfOuput: (int) count {
+    
+    if (count < 2) {
+        NSLog(@"Interpolate, illegal count!");
+    }
+    
+    NSArray array = new double[count + 1];
+    
+    for (int i = 0; i <= count; i++)
+        array[i] = start + i * (end - start) / count;
+    
+    return array;
     
 }
 
