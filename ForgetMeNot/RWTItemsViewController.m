@@ -32,8 +32,10 @@ int const kSecondsToPollFor = 5;
 @property int superOmniNdx;
 @property int smartThingsNdx;
 @property (strong, nonatomic) NSMutableArray *smartThingsDataPoints;
+@property (strong, nonatomic) NSMutableArray *superOmniDataPoints;
 @property (strong, nonatomic) NSArray *ratios;
-@property (strong, nonatomic) LinearRegression * linearFit;
+@property (strong, nonatomic) LinearRegression * superLinearFit;
+@property (strong, nonatomic) LinearRegression * smartLinearFit;
 
 @end
 
@@ -56,8 +58,11 @@ int const kSecondsToPollFor = 5;
     [self loadItems];
     
     // init array for smartThingsRanges
+    self.superOmniDataPoints = [[NSMutableArray alloc] initWithCapacity:kSecondsToPollFor];
     self.smartThingsDataPoints = [[NSMutableArray alloc] initWithCapacity:kSecondsToPollFor];
-    self.linearFit = [LinearRegression sharedInstance];
+    
+    self.smartLinearFit = [LinearRegression new];
+    self.superLinearFit = [LinearRegression new];
      
 }
 
@@ -148,7 +153,7 @@ int const kSecondsToPollFor = 5;
         didRangeBeacons:(NSArray *)beacons
                inRegion:(CLBeaconRegion *)region {
     
-    // If either ndx hasn't been assign, check to see if they're available. 
+    // If either ndx hasn't been assign, check to see if they're available.
     if (self.superOmniNdx == -1 || self.smartThingsNdx == -1)
         [self searchBeacons];
     
@@ -171,35 +176,55 @@ int const kSecondsToPollFor = 5;
     }
 }
 
-/* Create a new data point with the beacon rssi and accuracy value
- * Stores into an array
- * If full, calculates the linear regression and uses that in order to compute the best fit rssi value to base the volume off of. */
+/* Polls for kSecondsToPollFor gathering n data points.
+ * Calculates the linear regression. 
+ * Uses to compute the best fit rssi value to base the volume off of. */
 - (void) calcAvgAndStream: (CLBeacon *) beacon
                speakerNdx: (int) speakerNdx {
+    int setCount;
     
-    if (self.smartThingsDataPoints.count == kSecondsToPollFor) {
+    // beacon is superOmni
+    if (speakerNdx == self.superOmniNdx) {
+        setCount = self.superOmniDataPoints.count;
+    } else {
+        setCount = self.smartThingsDataPoints.count;
+    }
+    
+    if (setCount == kSecondsToPollFor) {
         
-        RegressionResult *answer = [self.linearFit calculate];
-        // Linear fit of the set of  data points...
-        // Using this linear fit, we can plug in the current dist to figure out the rssi and play accordingly.
+        // calculates the linear regression (best fit line with the set of data points)
+        RegressionResult *answer = [self.smartLinearFit calculate];
         float calcRSSI = (answer.slope * beacon.accuracy) + answer.intercept;
         
-        // clear data to go again
-        [self.smartThingsDataPoints removeObjectAtIndex:0];
-        [self.linearFit removeFirst];
+        // clear one data to go again (allows for one second polling basically)
+        if (speakerNdx == self.smartThingsNdx) {
+            [self.smartThingsDataPoints removeObjectAtIndex:0];
+            [self.smartLinearFit removeFirst];
+        }
+        else {
+            [self.superOmniDataPoints removeObjectAtIndex:0];
+            [self.superLinearFit removeFirst];
+        }
         
+        // check and use the calculated rssi value to adjust the volume of that associated speaker
         [self checkBeacon:beacon speakerNdx:speakerNdx avgRSSI:calcRSSI];
+    
     } else {
+        
         // add a new data point with rssi value and dist
-        NSLog(@"Added new dataPoint with rssi: %ld accuracy: %f", (long)beacon.rssi, beacon.accuracy);
         DataItem * temp = [DataItem new];
         temp.xValue = beacon.accuracy;
         temp.yValue = beacon.rssi;
-        [self.smartThingsDataPoints addObject: temp];
-        [self.linearFit addDataObject:temp];
+        
+        if (speakerNdx == self.superOmniNdx) {
+            [self.superOmniDataPoints addObject: temp];
+            [self.superLinearFit addDataObject: temp];
+        } else {
+            [self.smartThingsDataPoints addObject: temp];
+            [self.smartLinearFit addDataObject:temp];
+        }
+        
     }
-
-    
 }
 
 /* Helper method for determining which speaker - beacon is interacting and acts accordingly */
