@@ -13,8 +13,7 @@ Terms used:
 Currently the functionality of this application are:
 <br> 1) Able to start wake up from sleep and start playing music when in 'Near' or 'Immediate' vicinity of either speakers. 
 <br> 2) When 'Far', volume of associated speaker will drop to 0. 
+<br> 3) Implemented a linear regression algorithm. Current taking a set of k data points to calculate a more accurate rssi value to base the new volume off of. Polls for one second after, creating a new best fit line to approximate the next volume level. 
 
 Currently implementing and working on:
-<br>1) Linear Interpolation Algorithm - Smoothing out the gathered RSSI values from a set 
-  and using that as a more accurate date value to adjust the volume of the speaker accordingly.
 <br>2) Figuring out what initial volume would be best to start at.
