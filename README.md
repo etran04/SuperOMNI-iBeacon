@@ -36,9 +36,9 @@ HOW TO USE
 FAQs 
 ------------
 Q. What speaker is connected to which beacon? 
-The code currently is hardcoded to speakers with names "SuperOmni" and "SmartThings".
+<p>The code currently is hardcoded to speakers with names "SuperOmni" and "SmartThings".
 If it is named "SuperOmni", it has to have Harman's UUID, Major: 1010, and Minor: 1.
 If it is named "SmartThings", it has to have Harman's UUID, Major: 1100, and Minor: 1. 
 
 Q. How do I name my speaker? 
-Use the HK page app to name them. (only need to do this if you're connecting the speaker to a new network ) 
+<p>Use the HK page app to name them. (only need to do this if you're connecting the speaker to a new network ) 
