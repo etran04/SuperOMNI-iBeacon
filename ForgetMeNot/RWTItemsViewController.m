@@ -167,44 +167,7 @@ int const kSecondsToPollFor = 5;
                 
                 // Check if beacon is an SmartThings
                 if ([beacon.major intValue] == 1100 && self.smartThingsNdx != -1) {
-                    //[self checkBeacon:beacon speakerNdx:self.smartThingsNdx];
-                    
-                    // Create a new data point with the beacon rssi and accuracy value
-                    // Stores into an array
-                    // If full, interpolates, and returns average (full if 5 ranges)
-                    if (self.smartThingsDataPoints.count == kSecondsToPollFor) {
-                        
-                        /* weighted average over a set of five data points*/
-                        float sum = 0;
-                        DataItem * temp;
-                        for (int i = 1; i < self.smartThingsDataPoints.count-1; i++) {
-                            temp = self.smartThingsDataPoints[i];
-                            sum += temp.xValue;
-                        }
-                        float weightedAvg = sum / (self.smartThingsDataPoints.count - 2) ;
-                        NSLog(@"Weighted average is %f", weightedAvg);
-                        
-                        [self checkBeacon:beacon speakerNdx:self.smartThingsNdx avgRSSI:weightedAvg];
-
-                        
-                        // remove everything from first half
-                        for (int j = 0; j < self.smartThingsDataPoints.count / 2; j++)
-                            [self.smartThingsDataPoints removeObjectAtIndex:j];
-                        
-                        
-                        //RegressionResult *answer = [self.linearFit calculate];
-                        //NSLog(@"CURRENT regression slope %f", answer.slope);
-                        
-                    } else {
-                        // add a new data point with rssi value and dist
-                        // NSLog(@"Added new dataPoint");
-                        DataItem * temp = [DataItem new];
-                        temp.xValue = -beacon.rssi;
-                        temp.yValue = beacon.accuracy;
-                        [self.smartThingsDataPoints addObject: temp];
-                        //[self.linearFit addDataObject:temp];
-                    }
-                    
+                    [self calcAvgAndStream:beacon];
                 }
                 
             }
@@ -212,6 +175,46 @@ int const kSecondsToPollFor = 5;
     }
 }
 
+- (void) calcAvgAndStream: (CLBeacon *) beacon {
+
+    // Create a new data point with the beacon rssi and accuracy value
+    // Stores into an array
+    // If full, interpolates, and returns average (full if 5 ranges)
+    if (self.smartThingsDataPoints.count == kSecondsToPollFor) {
+        
+        /* weighted average over a set of five data points*/
+        float sum = 0;
+        DataItem * temp;
+        for (int i = 1; i < self.smartThingsDataPoints.count-1; i++) {
+            temp = self.smartThingsDataPoints[i];
+            sum += temp.xValue;
+        }
+        float weightedAvg = sum / (self.smartThingsDataPoints.count - 2) ;
+        NSLog(@"Weighted average is %f", weightedAvg);
+        
+        [self checkBeacon:beacon speakerNdx:self.smartThingsNdx avgRSSI:weightedAvg];
+        
+        
+        // remove everything from first half
+        for (int j = 0; j < self.smartThingsDataPoints.count / 2; j++)
+            [self.smartThingsDataPoints removeObjectAtIndex:j];
+        
+        
+        //RegressionResult *answer = [self.linearFit calculate];
+        //NSLog(@"CURRENT regression slope %f", answer.slope);
+        
+    } else {
+        // add a new data point with rssi value and dist
+        // NSLog(@"Added new dataPoint");
+        DataItem * temp = [DataItem new];
+        temp.xValue = -beacon.rssi;
+        temp.yValue = beacon.accuracy;
+        [self.smartThingsDataPoints addObject: temp];
+        //[self.linearFit addDataObject:temp];
+    }
+
+    
+}
 
 /* Helper method for determining which speaker - beacon is interacting and acts accordingly */
 - (void) checkBeacon: (CLBeacon *)beacon

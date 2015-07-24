@@ -13,7 +13,6 @@
 		074550B91B4CA43B00A7E705 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 83EC54C01898DD3600EA1765 /* Main.storyboard */; };
 		07E52B721B54721200C06F0C /* ItemCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 8391CE4D189A4D4F0072A2D3 /* ItemCell.m */; };
 		07E551E21B6056CB00419877 /* Eiffel 65 - I'm blue with lyrics.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 07E551E11B6056CB00419877 /* Eiffel 65 - I'm blue with lyrics.mp3 */; };
-		07F0F9C91B618BF300804AB2 /* DataPoint.m in Sources */ = {isa = PBXBuildFile; fileRef = 07F0F9C81B618BF300804AB2 /* DataPoint.m */; };
 		07F0F9D41B61B0F000804AB2 /* DataItem.m in Sources */ = {isa = PBXBuildFile; fileRef = 07F0F9CD1B61B0F000804AB2 /* DataItem.m */; };
 		07F0F9D51B61B0F000804AB2 /* LinearRegression.m in Sources */ = {isa = PBXBuildFile; fileRef = 07F0F9D01B61B0F000804AB2 /* LinearRegression.m */; };
 		07F0F9D61B61B0F000804AB2 /* README.markdown in Sources */ = {isa = PBXBuildFile; fileRef = 07F0F9D11B61B0F000804AB2 /* README.markdown */; };
@@ -52,8 +51,6 @@
 		072229A61B41F04A000EA416 /* CoreLocation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreLocation.framework; path = System/Library/Frameworks/CoreLocation.framework; sourceTree = SDKROOT; };
 		07E551E11B6056CB00419877 /* Eiffel 65 - I'm blue with lyrics.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = "Eiffel 65 - I'm blue with lyrics.mp3"; sourceTree = "<group>"; };
 		07EDBF041B4B01560072219E /* ForgetMeNot.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; path = ForgetMeNot.xcodeproj; sourceTree = "<group>"; };
-		07F0F9C81B618BF300804AB2 /* DataPoint.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DataPoint.m; sourceTree = "<group>"; };
-		07F0F9CA1B618CD700804AB2 /* DataPoint.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = DataPoint.h; sourceTree = "<group>"; };
 		07F0F9CC1B61B0F000804AB2 /* DataItem.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DataItem.h; sourceTree = "<group>"; };
 		07F0F9CD1B61B0F000804AB2 /* DataItem.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DataItem.m; sourceTree = "<group>"; };
 		07F0F9CE1B61B0F000804AB2 /* LinearRegression-Prefix.pch */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "LinearRegression-Prefix.pch"; sourceTree = "<group>"; };
@@ -230,8 +227,6 @@
 				070963F81B44AF5D000D96CA /* NowPlayingController.m */,
 				8391CE4C189A4D4F0072A2D3 /* ItemCell.h */,
 				8391CE4D189A4D4F0072A2D3 /* ItemCell.m */,
-				07F0F9CA1B618CD700804AB2 /* DataPoint.h */,
-				07F0F9C81B618BF300804AB2 /* DataPoint.m */,
 				83EC54B51898DD3600EA1765 /* Supporting Files */,
 			);
 			name = SuperOMNI;
@@ -387,7 +382,6 @@
 				070963F91B44AF5D000D96CA /* NowPlayingController.m in Sources */,
 				07F0F9D51B61B0F000804AB2 /* LinearRegression.m in Sources */,
 				07F0F9D71B61B0F000804AB2 /* RegressionResult.m in Sources */,
-				07F0F9C91B618BF300804AB2 /* DataPoint.m in Sources */,
 				83EC54C51898DD3600EA1765 /* RWTItemsViewController.m in Sources */,
 				83EC54E81898E05E00EA1765 /* RWTAddItemViewController.m in Sources */,
 				83EC54EB1898E13900EA1765 /* RWTItem.m in Sources */,
