@@ -3,7 +3,7 @@
 //  SuperOMNI
 //
 //  Created by Eric Tran on 7/2/15.
-//  Copyright (c) 2014 Harman International. All rights reserved.
+//  Copyright (c) 2015 Harman International. All rights reserved.
 //
 
 #import "RWTItemsViewController.h"
@@ -57,7 +57,6 @@ int const kSecondsToPollFor = 5;
     
     // init array for smartThingsRanges
     self.smartThingsDataPoints = [[NSMutableArray alloc] initWithCapacity:kSecondsToPollFor];
-    
     self.linearFit = [LinearRegression sharedInstance];
      
 }
@@ -149,6 +148,7 @@ int const kSecondsToPollFor = 5;
         didRangeBeacons:(NSArray *)beacons
                inRegion:(CLBeaconRegion *)region {
     
+    // If either ndx hasn't been assign, check to see if they're available. 
     if (self.superOmniNdx == -1 || self.smartThingsNdx == -1)
         [self searchBeacons];
     
@@ -157,15 +157,13 @@ int const kSecondsToPollFor = 5;
             if ([item isEqualToCLBeacon:beacon]) {
                 item.lastSeenBeacon = beacon;
                 
-                //NSLog(@"RSSI: %ld | Distance: %f", (long)beacon.rssi, beacon.accuracy);
-                
                 // Check if beacon is an SuperOmni
-                //if ([beacon.major intValue] == 1010 && self.superOmniNdx != -1)
-                    //[self checkBeacon:beacon speakerNdx:self.superOmniNdx];
+                if ([beacon.major intValue] == 1010 && self.superOmniNdx != -1)
+                    [self calcAvgAndStream: beacon speakerNdx:self.superOmniNdx];
                 
                 // Check if beacon is an SmartThings
                 if ([beacon.major intValue] == 1100 && self.smartThingsNdx != -1) {
-                    [self calcAvgAndStream:beacon];
+                    [self calcAvgAndStream: beacon speakerNdx:self.smartThingsNdx];
                 }
                 
             }
@@ -176,7 +174,8 @@ int const kSecondsToPollFor = 5;
 /* Create a new data point with the beacon rssi and accuracy value
  * Stores into an array
  * If full, calculates the linear regression and uses that in order to compute the best fit rssi value to base the volume off of. */
-- (void) calcAvgAndStream: (CLBeacon *) beacon {
+- (void) calcAvgAndStream: (CLBeacon *) beacon
+               speakerNdx: (int) speakerNdx {
     
     if (self.smartThingsDataPoints.count == kSecondsToPollFor) {
         
@@ -189,7 +188,7 @@ int const kSecondsToPollFor = 5;
         [self.smartThingsDataPoints removeObjectAtIndex:0];
         [self.linearFit removeFirst];
         
-        [self checkBeacon:beacon speakerNdx:self.smartThingsNdx avgRSSI:calcRSSI];
+        [self checkBeacon:beacon speakerNdx:speakerNdx avgRSSI:calcRSSI];
     } else {
         // add a new data point with rssi value and dist
         NSLog(@"Added new dataPoint with rssi: %ld accuracy: %f", (long)beacon.rssi, beacon.accuracy);
