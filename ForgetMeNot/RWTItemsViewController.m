@@ -231,28 +231,34 @@ int const kSmartThingsMajor = 1100;
     if (index == self.superOmniNdx) {
         [self.superOmniDataPoints addObject: temp];
         [self.superLinearFit addDataObject: temp];
+        
+        // Check if in range of 0 - kSecondsToStart
+        [self calcInitAvg:beacon currentSec:setCount speakerNdx:index dataPointArray:self.superOmniDataPoints];
+
     } else {
         [self.smartThingsDataPoints addObject: temp];
         [self.smartLinearFit addDataObject:temp];
         
-        [self calcInitAvg:beacon currentSec:setCount speakerNdx:index];
+        // Check if in range of 0 - kSecondsToStart
+        [self calcInitAvg:beacon currentSec:setCount speakerNdx:index dataPointArray:self.smartThingsDataPoints];
     }
 }
 
 /* Helper method for calculating the initial average rssi to use for initial speaker startup */
 - (void) calcInitAvg: (CLBeacon *) beacon
           currentSec: (int) setCount
-          speakerNdx: (int) index {
+          speakerNdx: (int) index
+      dataPointArray: (NSMutableArray *) data {
     // In the time interval of 0 to kSecondsToStart, use avg of all values up till then to start playing.
     if (setCount == kSecondsToStart)
     {
         DataItem * currData;
         int sum = 0;
         for (int i = 0; i < kSecondsToStart; i++) {
-            currData = self.smartThingsDataPoints[i];
+            currData = data[i];
             sum += currData.xValue;
         }
-        float avg = sum / self.smartThingsDataPoints.count;
+        float avg = sum / data.count;
         [self checkBeacon:beacon speakerNdx:index avgRSSI:avg];
     }
 }
@@ -268,12 +274,11 @@ int const kSmartThingsMajor = 1100;
     if (beacon.proximity == CLProximityNear || beacon.proximity == CLProximityImmediate) {
         int volumeLvl = [self changeVolumeBasedOnRSSI:rssi];
         
-        // If beacon correlates to superomni (omni10), add volume to make it louder
-        if ([beacon.major intValue] == 1010)
-            volumeLvl += 5;
-        else if ([beacon.major intValue] == 1100) // Beacon is smartThings (Omni20), play more quiter
+        if ([beacon.major intValue] == kSmartThingsMajor) // Beacon is smartThings (Omni20), play more quiter
             volumeLvl -= 6;
         
+        
+        NSLog(@"Trying to set volume of %d to %d", index, volumeLvl);
         [temp setVolumeDevice:[temp getDeviceInfoByIndex:index].deviceId volume:volumeLvl];
         
         // If song isn't playing start playing it
@@ -329,14 +334,12 @@ int const kSmartThingsMajor = 1100;
  */
 - (int) changeVolumeBasedOnRSSI: (float) rssi {
     
-    // Realistically, can't go father than -88 approx.
-    if (rssi < -80)
-        return 40;
-    else if (rssi < -70)
+    // Realistically, can't go father than -90 approx.
+    if (rssi < -70)
         return 35;
-    else if (rssi < -60)
+    else if (rssi < -55)
         return 30;
-    else if (rssi < -45)
+    else if (rssi < -40)
         return 25;
     else if (rssi < -25)
         return 20;
