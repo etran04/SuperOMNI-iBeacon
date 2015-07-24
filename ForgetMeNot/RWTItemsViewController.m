@@ -21,7 +21,10 @@
 @import Foundation;
 
 NSString * const kRWTStoredItemsKey = @"storedItems";
+int const kSecondsToStart = 2;
 int const kSecondsToPollFor = 5;
+int const kSuperOmniMajor = 1010;
+int const kSmartThingsMajor = 1100;
 
 @interface RWTItemsViewController () <UITableViewDataSource, UITableViewDelegate, CLLocationManagerDelegate>
 
@@ -44,13 +47,13 @@ int const kSecondsToPollFor = 5;
 
 - (void)viewDidLoad {
     [super viewDidLoad];
-
+    
     // Set up location manager
     self.locationManager = [[CLLocationManager alloc] init];
     if ([self.locationManager respondsToSelector:@selector(requestAlwaysAuthorization)])
         [self.locationManager requestAlwaysAuthorization];
     self.locationManager.delegate = self;
-
+    
     self.superOmniNdx = self.smartThingsNdx = -1;
     [self searchBeacons];
     [[HKWControlHandler sharedInstance] setVolumeAll: 0];
@@ -63,7 +66,7 @@ int const kSecondsToPollFor = 5;
     
     self.smartLinearFit = [LinearRegression new];
     self.superLinearFit = [LinearRegression new];
-     
+    
 }
 
 /* Goes through list of speakers and assigns index number to the superOmni and the smartThings speaker
@@ -163,11 +166,11 @@ int const kSecondsToPollFor = 5;
                 item.lastSeenBeacon = beacon;
                 
                 // Check if beacon is an SuperOmni
-                if ([beacon.major intValue] == 1010 && self.superOmniNdx != -1)
+                if ([beacon.major intValue] == kSuperOmniMajor && self.superOmniNdx != -1)
                     [self calcAvgAndStream: beacon speakerNdx:self.superOmniNdx];
                 
                 // Check if beacon is an SmartThings
-                if ([beacon.major intValue] == 1100 && self.smartThingsNdx != -1) {
+                if ([beacon.major intValue] == kSmartThingsMajor && self.smartThingsNdx != -1) {
                     [self calcAvgAndStream: beacon speakerNdx:self.smartThingsNdx];
                 }
                 
@@ -177,7 +180,7 @@ int const kSecondsToPollFor = 5;
 }
 
 /* Polls for kSecondsToPollFor gathering n data points.
- * Calculates the linear regression. 
+ * Calculates the linear regression.
  * Uses to compute the best fit rssi value to base the volume off of. */
 - (void) calcAvgAndStream: (CLBeacon *) beacon
                speakerNdx: (int) speakerNdx {
@@ -208,23 +211,43 @@ int const kSecondsToPollFor = 5;
         
         // check and use the calculated rssi value to adjust the volume of that associated speaker
         [self checkBeacon:beacon speakerNdx:speakerNdx avgRSSI:calcRSSI];
-    
+        
     } else {
-        
-        // add a new data point with rssi value and dist
-        DataItem * temp = [DataItem new];
-        temp.xValue = beacon.accuracy;
-        temp.yValue = beacon.rssi;
-        
-        if (speakerNdx == self.superOmniNdx) {
-            [self.superOmniDataPoints addObject: temp];
-            [self.superLinearFit addDataObject: temp];
-        } else {
-            [self.smartThingsDataPoints addObject: temp];
-            [self.smartLinearFit addDataObject:temp];
-        }
-        
+        [self initSpeakerPlay:beacon speakerNdx:speakerNdx currentSec:setCount];
     }
+}
+
+/* Helper method for handling the initial speaker starting on from 0 - k seconds. */
+- (void) initSpeakerPlay: (CLBeacon *) beacon
+              speakerNdx: (int) speakerNdx
+              currentSec: (int) setCount {
+    
+    // add a new data point with rssi value and dist
+    DataItem * temp = [DataItem new];
+    temp.xValue = beacon.accuracy;
+    temp.yValue = beacon.rssi;
+    
+    if (speakerNdx == self.superOmniNdx) {
+        [self.superOmniDataPoints addObject: temp];
+        [self.superLinearFit addDataObject: temp];
+    } else {
+        [self.smartThingsDataPoints addObject: temp];
+        [self.smartLinearFit addDataObject:temp];
+        
+        // in the time interval of 0 to kSecondsToStart, use avg of all values up till then to start playing.
+        if (setCount == kSecondsToStart)
+        {
+            DataItem * currData;
+            int sum = 0;
+            for (int i = 0; i < kSecondsToStart; i++) {
+                currData = self.smartThingsDataPoints[i];
+                sum += temp.xValue;
+            }
+            float avg = sum / self.smartThingsDataPoints.count;
+            [self checkBeacon:beacon speakerNdx:self.smartThingsNdx avgRSSI:avg];
+        }
+    }
+    
 }
 
 /* Helper method for determining which speaker - beacon is interacting and acts accordingly */
@@ -312,17 +335,17 @@ int const kSecondsToPollFor = 5;
 
 
 /* Linear interpolation helper method between two points, returns the estimated dist value at newDist
-- (float) lerpForNewDistance: (float) targetRssi
-                      pointA: (DataPoint *) pointA
-                      pointB: (DataPoint *) pointB {
-    
-    float slope = (pointB.distValue - pointA.distValue) / (pointB.rssiValue - pointA.rssiValue) ;
-    
-    return -(pointA.distValue + (targetRssi - pointA.rssiValue) * slope);
-}*/
+ - (float) lerpForNewDistance: (float) targetRssi
+ pointA: (DataPoint *) pointA
+ pointB: (DataPoint *) pointB {
+ 
+ float slope = (pointB.distValue - pointA.distValue) / (pointB.rssiValue - pointA.rssiValue) ;
+ 
+ return -(pointA.distValue + (targetRssi - pointA.rssiValue) * slope);
+ }*/
 
 
-#pragma mark - UITableViewDataSource 
+#pragma mark - UITableViewDataSource
 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
     return self.items.count;
@@ -345,7 +368,7 @@ int const kSecondsToPollFor = 5;
         // Stops the monitoring of an item after removal,
         RWTItem *itemToRemove = [self.items objectAtIndex:indexPath.row];
         [self stopMonitoringItem:itemToRemove];
-
+        
         [tableView beginUpdates];
         [self.items removeObjectAtIndex:indexPath.row];
         [tableView deleteRowsAtIndexPaths:@[indexPath] withRowAnimation:UITableViewRowAnimationAutomatic];
