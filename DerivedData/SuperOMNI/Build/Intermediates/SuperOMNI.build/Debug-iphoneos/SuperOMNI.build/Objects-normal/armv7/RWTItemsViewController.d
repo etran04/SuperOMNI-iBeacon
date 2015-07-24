@@ -8,4 +8,7 @@ dependencies: \
   /Users/Eric/Desktop/SuperOMNI-Project/ForgetMeNot/HKWirelessHDSDK/include/DeviceInfo.h \
   /Users/Eric/Desktop/SuperOMNI-Project/ForgetMeNot/HKWirelessHDSDK/include/DeviceGroup.h \
   /Users/Eric/Desktop/SuperOMNI-Project/ForgetMeNot/HKWirelessHDSDK/include/HKWPlayerEventHandlerSingleton.h \
-  /Users/Eric/Desktop/SuperOMNI-Project/ForgetMeNot/HKWirelessHDSDK/include/HKWDeviceEventHandlerSingleton.h
+  /Users/Eric/Desktop/SuperOMNI-Project/ForgetMeNot/HKWirelessHDSDK/include/HKWDeviceEventHandlerSingleton.h \
+  /Users/Eric/Desktop/SuperOMNI-Project/LinearRegression/DataItem.h \
+  /Users/Eric/Desktop/SuperOMNI-Project/LinearRegression/LinearRegression.h \
+  /Users/Eric/Desktop/SuperOMNI-Project/LinearRegression/RegressionResult.h

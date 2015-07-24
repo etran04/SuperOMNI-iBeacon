@@ -13,11 +13,15 @@
 #import "HKWControlHandler.h"
 #import "HKWPlayerEventHandlerSingleton.h"
 #import "HKWDeviceEventHandlerSingleton.h"
+#import "DataItem.h"
+#import "LinearRegression.h"
+#import "RegressionResult.h"
 
 @import CoreLocation;
 @import Foundation;
 
 NSString * const kRWTStoredItemsKey = @"storedItems";
+int const kSecondsToPollFor = 5;
 
 @interface RWTItemsViewController () <UITableViewDataSource, UITableViewDelegate, CLLocationManagerDelegate>
 
@@ -27,27 +31,36 @@ NSString * const kRWTStoredItemsKey = @"storedItems";
 @property (strong, nonatomic) NSArray *music;
 @property int superOmniNdx;
 @property int smartThingsNdx;
+@property (strong, nonatomic) NSMutableArray *smartThingsDataPoints;
+@property (strong, nonatomic) NSArray *ratios;
+@property (strong, nonatomic) LinearRegression * linearFit;
 
 @end
 
 @implementation RWTItemsViewController
+
 
 - (void)viewDidLoad {
     [super viewDidLoad];
 
     // Set up location manager
     self.locationManager = [[CLLocationManager alloc] init];
-    if ([self.locationManager respondsToSelector:@selector(requestAlwaysAuthorization)]) {
+    if ([self.locationManager respondsToSelector:@selector(requestAlwaysAuthorization)])
         [self.locationManager requestAlwaysAuthorization];
-    }
     self.locationManager.delegate = self;
 
     self.superOmniNdx = self.smartThingsNdx = -1;
-    
     [self searchBeacons];
-    
     [[HKWControlHandler sharedInstance] setVolumeAll: 0];
+    
     [self loadItems];
+    
+    // init array for smartTHingsRanges
+    self.smartThingsDataPoints = [[NSMutableArray alloc] initWithCapacity:kSecondsToPollFor];
+    
+    self.ratios = [[NSArray alloc] initWithObjects:[NSNumber numberWithFloat:0.2],[NSNumber numberWithFloat:0.3], [NSNumber numberWithFloat:0.3], [NSNumber numberWithFloat:0.2], nil];
+    
+    self.linearFit = [LinearRegression sharedInstance];
      
 }
 
@@ -133,8 +146,7 @@ NSString * const kRWTStoredItemsKey = @"storedItems";
     [self.locationManager stopRangingBeaconsInRegion:beaconRegion];
 }
 
-
-/* Called for when a iBeacon comes within range, move out of range, or when the range of an iBeacon changes */
+/* Called for when a iBeacon comes within range, move out of range, or when the range of an iBeacon changes (called at a frequency of 1Hz) */
 - (void)locationManager:(CLLocationManager *)manager
         didRangeBeacons:(NSArray *)beacons
                inRegion:(CLBeaconRegion *)region {
@@ -147,30 +159,70 @@ NSString * const kRWTStoredItemsKey = @"storedItems";
             if ([item isEqualToCLBeacon:beacon]) {
                 item.lastSeenBeacon = beacon;
                 
+                //NSLog(@"RSSI: %ld | Distance: %f", (long)beacon.rssi, beacon.accuracy);
+                
                 // Check if beacon is an SuperOmni
-                if ([beacon.major intValue] == 1010 && self.superOmniNdx != -1)
-                    [self checkBeacon:beacon speakerNdx:self.superOmniNdx];
+                //if ([beacon.major intValue] == 1010 && self.superOmniNdx != -1)
+                    //[self checkBeacon:beacon speakerNdx:self.superOmniNdx];
                 
                 // Check if beacon is an SmartThings
-                if ([beacon.major intValue] == 1100 && self.smartThingsNdx != -1)
-                    [self checkBeacon:beacon speakerNdx:self.smartThingsNdx];
-                else
-                    [[HKWControlHandler sharedInstance] setVolumeDevice:[[HKWControlHandler sharedInstance] getDeviceInfoByIndex:self.smartThingsNdx].deviceId volume:0];
+                if ([beacon.major intValue] == 1100 && self.smartThingsNdx != -1) {
+                    //[self checkBeacon:beacon speakerNdx:self.smartThingsNdx];
+                    
+                    // Create a new data point with the beacon rssi and accuracy value
+                    // Stores into an array
+                    // If full, interpolates, and returns average (full if 5 ranges)
+                    if (self.smartThingsDataPoints.count == kSecondsToPollFor) {
+                        
+                        /* weighted average over a set of five data points*/
+                        float sum = 0;
+                        DataItem * temp;
+                        for (int i = 1; i < self.smartThingsDataPoints.count-1; i++) {
+                            temp = self.smartThingsDataPoints[i];
+                            sum += temp.xValue;
+                        }
+                        float weightedAvg = sum / (self.smartThingsDataPoints.count - 2) ;
+                        NSLog(@"Weighted average is %f", weightedAvg);
+                        
+                        [self checkBeacon:beacon speakerNdx:self.smartThingsNdx avgRSSI:weightedAvg];
+
+                        
+                        // remove everything from first half
+                        for (int j = 0; j < self.smartThingsDataPoints.count / 2; j++)
+                            [self.smartThingsDataPoints removeObjectAtIndex:j];
+                        
+                        
+                        //RegressionResult *answer = [self.linearFit calculate];
+                        //NSLog(@"CURRENT regression slope %f", answer.slope);
+                        
+                    } else {
+                        // add a new data point with rssi value and dist
+                        // NSLog(@"Added new dataPoint");
+                        DataItem * temp = [DataItem new];
+                        temp.xValue = -beacon.rssi;
+                        temp.yValue = beacon.accuracy;
+                        [self.smartThingsDataPoints addObject: temp];
+                        //[self.linearFit addDataObject:temp];
+                    }
+                    
+                }
                 
             }
         }
     }
 }
 
+
 /* Helper method for determining which speaker - beacon is interacting and acts accordingly */
 - (void) checkBeacon: (CLBeacon *)beacon
-          speakerNdx: (int)index {
+          speakerNdx: (int)index
+             avgRSSI: (float)rssi {
     
     HKWControlHandler *temp = [HKWControlHandler sharedInstance];
     
     // If the beacon is 'Near' or 'Immediate'(ly) close, play music on that speaker and adjust the volume if we move around.
     if (beacon.proximity == CLProximityNear || beacon.proximity == CLProximityImmediate) {
-        int volumeLvl = [self changeVolumeBasedOnRSSI:beacon];
+        int volumeLvl = [self changeVolumeBasedOnRSSI:-rssi];
         
         // If beacon correlates to superomni (omni10), add volume to make it louder
         if ([beacon.major intValue] == 1010)
@@ -227,41 +279,33 @@ NSString * const kRWTStoredItemsKey = @"storedItems";
  * UPDATE: This is actually pretty unreliable. RSSI fluctuates very heavily and can be interfered with by very common things.
  * iBeacons should be used to sense just sense proximity as of right now.
  * UPDATE 2: After talking with Seonman and Kevin, doing linear interpolation and averaging out a set might be what we want. */
-- (int) changeVolumeBasedOnRSSI: (CLBeacon *) beacon {
+- (int) changeVolumeBasedOnRSSI: (float) rssi { //(CLBeacon *) beacon {
     
     // Realistically, can't go father than -88 approx.
-    if (beacon.rssi < -80)
+    if (rssi < -80)
         return 40;
-    else if (beacon.rssi < -70)
+    else if (rssi < -70)
         return 35;
-    else if (beacon.rssi < -60)
+    else if (rssi < -60)
         return 30;
-    else if (beacon.rssi < -45)
+    else if (rssi < -45)
         return 25;
-    else if (beacon.rssi < -25)
+    else if (rssi < -25)
         return 20;
     
     return 0; // Unknown rssi
 }
 
 
-/* Linear interpolation helper method between two points */
-- (void) interpolationStarting: (double) start
-                   endingIndex: (double) end
-                  countOfOuput: (int) count {
+/* Linear interpolation helper method between two points, returns the estimated dist value at newDist
+- (float) lerpForNewDistance: (float) targetRssi
+                      pointA: (DataPoint *) pointA
+                      pointB: (DataPoint *) pointB {
     
-    if (count < 2) {
-        NSLog(@"Interpolate, illegal count!");
-    }
+    float slope = (pointB.distValue - pointA.distValue) / (pointB.rssiValue - pointA.rssiValue) ;
     
-    NSArray array = new double[count + 1];
-    
-    for (int i = 0; i <= count; i++)
-        array[i] = start + i * (end - start) / count;
-    
-    return array;
-    
-}
+    return -(pointA.distValue + (targetRssi - pointA.rssiValue) * slope);
+}*/
 
 
 #pragma mark - UITableViewDataSource 

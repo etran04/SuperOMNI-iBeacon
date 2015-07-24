@@ -11,8 +11,13 @@
 		072229A71B41F04A000EA416 /* CoreLocation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 072229A61B41F04A000EA416 /* CoreLocation.framework */; };
 		074550B61B4CA37400A7E705 /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 83EC54C61898DD3600EA1765 /* Images.xcassets */; };
 		074550B91B4CA43B00A7E705 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 83EC54C01898DD3600EA1765 /* Main.storyboard */; };
-		07E52B721B54721200C06F0C /* RWTItemCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 8391CE4D189A4D4F0072A2D3 /* RWTItemCell.m */; };
+		07E52B721B54721200C06F0C /* ItemCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 8391CE4D189A4D4F0072A2D3 /* ItemCell.m */; };
 		07E551E21B6056CB00419877 /* Eiffel 65 - I'm blue with lyrics.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 07E551E11B6056CB00419877 /* Eiffel 65 - I'm blue with lyrics.mp3 */; };
+		07F0F9C91B618BF300804AB2 /* DataPoint.m in Sources */ = {isa = PBXBuildFile; fileRef = 07F0F9C81B618BF300804AB2 /* DataPoint.m */; };
+		07F0F9D41B61B0F000804AB2 /* DataItem.m in Sources */ = {isa = PBXBuildFile; fileRef = 07F0F9CD1B61B0F000804AB2 /* DataItem.m */; };
+		07F0F9D51B61B0F000804AB2 /* LinearRegression.m in Sources */ = {isa = PBXBuildFile; fileRef = 07F0F9D01B61B0F000804AB2 /* LinearRegression.m */; };
+		07F0F9D61B61B0F000804AB2 /* README.markdown in Sources */ = {isa = PBXBuildFile; fileRef = 07F0F9D11B61B0F000804AB2 /* README.markdown */; };
+		07F0F9D71B61B0F000804AB2 /* RegressionResult.m in Sources */ = {isa = PBXBuildFile; fileRef = 07F0F9D31B61B0F000804AB2 /* RegressionResult.m */; };
 		07FBD35D1B43417700339205 /* libHKWirelessHD.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 07FBD35C1B43417700339205 /* libHKWirelessHD.a */; settings = {ATTRIBUTES = (Required, ); }; };
 		07FBD35F1B43463B00339205 /* libz.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 07FBD35E1B43463B00339205 /* libz.dylib */; };
 		07FBD3611B43464900339205 /* libbz2.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 07FBD3601B43464900339205 /* libbz2.dylib */; };
@@ -47,6 +52,16 @@
 		072229A61B41F04A000EA416 /* CoreLocation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreLocation.framework; path = System/Library/Frameworks/CoreLocation.framework; sourceTree = SDKROOT; };
 		07E551E11B6056CB00419877 /* Eiffel 65 - I'm blue with lyrics.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = "Eiffel 65 - I'm blue with lyrics.mp3"; sourceTree = "<group>"; };
 		07EDBF041B4B01560072219E /* ForgetMeNot.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; path = ForgetMeNot.xcodeproj; sourceTree = "<group>"; };
+		07F0F9C81B618BF300804AB2 /* DataPoint.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DataPoint.m; sourceTree = "<group>"; };
+		07F0F9CA1B618CD700804AB2 /* DataPoint.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = DataPoint.h; sourceTree = "<group>"; };
+		07F0F9CC1B61B0F000804AB2 /* DataItem.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DataItem.h; sourceTree = "<group>"; };
+		07F0F9CD1B61B0F000804AB2 /* DataItem.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DataItem.m; sourceTree = "<group>"; };
+		07F0F9CE1B61B0F000804AB2 /* LinearRegression-Prefix.pch */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "LinearRegression-Prefix.pch"; sourceTree = "<group>"; };
+		07F0F9CF1B61B0F000804AB2 /* LinearRegression.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LinearRegression.h; sourceTree = "<group>"; };
+		07F0F9D01B61B0F000804AB2 /* LinearRegression.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = LinearRegression.m; sourceTree = "<group>"; };
+		07F0F9D11B61B0F000804AB2 /* README.markdown */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = net.daringfireball.markdown; path = README.markdown; sourceTree = "<group>"; };
+		07F0F9D21B61B0F000804AB2 /* RegressionResult.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RegressionResult.h; sourceTree = "<group>"; };
+		07F0F9D31B61B0F000804AB2 /* RegressionResult.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RegressionResult.m; sourceTree = "<group>"; };
 		07FBD35C1B43417700339205 /* libHKWirelessHD.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libHKWirelessHD.a; path = ForgetMeNot/HKWirelessHDSDK/lib/libHKWirelessHD.a; sourceTree = "<group>"; };
 		07FBD35E1B43463B00339205 /* libz.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libz.dylib; path = usr/lib/libz.dylib; sourceTree = SDKROOT; };
 		07FBD3601B43464900339205 /* libbz2.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libbz2.dylib; path = usr/lib/libbz2.dylib; sourceTree = SDKROOT; };
@@ -57,7 +72,7 @@
 		07FBD3681B43493F00339205 /* HKWPlayerEventHandlerSingleton.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = HKWPlayerEventHandlerSingleton.h; sourceTree = "<group>"; };
 		07FBD36A1B43493F00339205 /* libHKWirelessHD.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = libHKWirelessHD.a; sourceTree = "<group>"; };
 		8391CE4C189A4D4F0072A2D3 /* ItemCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ItemCell.h; sourceTree = "<group>"; };
-		8391CE4D189A4D4F0072A2D3 /* RWTItemCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RWTItemCell.m; sourceTree = "<group>"; };
+		8391CE4D189A4D4F0072A2D3 /* ItemCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ItemCell.m; sourceTree = "<group>"; };
 		83EC54AB1898DD3600EA1765 /* SuperOMNI.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = SuperOMNI.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		83EC54AE1898DD3600EA1765 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
 		83EC54B01898DD3600EA1765 /* CoreGraphics.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreGraphics.framework; path = System/Library/Frameworks/CoreGraphics.framework; sourceTree = SDKROOT; };
@@ -116,6 +131,21 @@
 			name = Products;
 			sourceTree = "<group>";
 		};
+		07F0F9CB1B61B0F000804AB2 /* LinearRegression */ = {
+			isa = PBXGroup;
+			children = (
+				07F0F9CC1B61B0F000804AB2 /* DataItem.h */,
+				07F0F9CD1B61B0F000804AB2 /* DataItem.m */,
+				07F0F9CE1B61B0F000804AB2 /* LinearRegression-Prefix.pch */,
+				07F0F9CF1B61B0F000804AB2 /* LinearRegression.h */,
+				07F0F9D01B61B0F000804AB2 /* LinearRegression.m */,
+				07F0F9D11B61B0F000804AB2 /* README.markdown */,
+				07F0F9D21B61B0F000804AB2 /* RegressionResult.h */,
+				07F0F9D31B61B0F000804AB2 /* RegressionResult.m */,
+			);
+			path = LinearRegression;
+			sourceTree = "<group>";
+		};
 		07FBD3621B43493F00339205 /* HKWirelessHDSDK */ = {
 			isa = PBXGroup;
 			children = (
@@ -149,6 +179,7 @@
 		83EC54A21898DD3600EA1765 = {
 			isa = PBXGroup;
 			children = (
+				07F0F9CB1B61B0F000804AB2 /* LinearRegression */,
 				07FBD3621B43493F00339205 /* HKWirelessHDSDK */,
 				83EC54B41898DD3600EA1765 /* SuperOMNI */,
 				83EC54D31898DD3600EA1765 /* SuperOMNITests */,
@@ -197,9 +228,11 @@
 				83EC54C41898DD3600EA1765 /* RWTItemsViewController.m */,
 				070963FA1B44AF6F000D96CA /* NowPlayingController.h */,
 				070963F81B44AF5D000D96CA /* NowPlayingController.m */,
-				83EC54B51898DD3600EA1765 /* Supporting Files */,
 				8391CE4C189A4D4F0072A2D3 /* ItemCell.h */,
-				8391CE4D189A4D4F0072A2D3 /* RWTItemCell.m */,
+				8391CE4D189A4D4F0072A2D3 /* ItemCell.m */,
+				07F0F9CA1B618CD700804AB2 /* DataPoint.h */,
+				07F0F9C81B618BF300804AB2 /* DataPoint.m */,
+				83EC54B51898DD3600EA1765 /* Supporting Files */,
 			);
 			name = SuperOMNI;
 			path = ForgetMeNot;
@@ -282,7 +315,7 @@
 			attributes = {
 				CLASSPREFIX = "";
 				LastUpgradeCheck = 0640;
-				ORGANIZATIONNAME = Harman;
+				ORGANIZATIONNAME = "Harman International";
 				TargetAttributes = {
 					83EC54AA1898DD3600EA1765 = {
 						DevelopmentTeam = CWEESB29TK;
@@ -348,8 +381,13 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				07E52B721B54721200C06F0C /* RWTItemCell.m in Sources */,
+				07F0F9D61B61B0F000804AB2 /* README.markdown in Sources */,
+				07E52B721B54721200C06F0C /* ItemCell.m in Sources */,
+				07F0F9D41B61B0F000804AB2 /* DataItem.m in Sources */,
 				070963F91B44AF5D000D96CA /* NowPlayingController.m in Sources */,
+				07F0F9D51B61B0F000804AB2 /* LinearRegression.m in Sources */,
+				07F0F9D71B61B0F000804AB2 /* RegressionResult.m in Sources */,
+				07F0F9C91B618BF300804AB2 /* DataPoint.m in Sources */,
 				83EC54C51898DD3600EA1765 /* RWTItemsViewController.m in Sources */,
 				83EC54E81898E05E00EA1765 /* RWTAddItemViewController.m in Sources */,
 				83EC54EB1898E13900EA1765 /* RWTItem.m in Sources */,
