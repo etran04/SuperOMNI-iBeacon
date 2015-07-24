@@ -8,7 +8,9 @@ WORK IN PROGRESS
 
 Terms used: 
 <br>SuperOmni - Omni 10 with embedded iBeacon
-<br>SmartThings - Omni 20 near my desk with an Gimbal iBeacon near it 
+<br>SmartThings - Omni 20 with RFDuino acting as iBeacon beside it
+
+Almost all of iBeacon functionality with HK speakers are written in RWTItemViewController.m! 
 
 Currently the functionality of this application are:
 <br> 1) Able to start wake up from sleep and start playing music when in 'Near' or 'Immediate' vicinity of either speakers. 
