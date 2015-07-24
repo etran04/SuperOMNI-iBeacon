@@ -183,15 +183,14 @@ int const kSmartThingsMajor = 1100;
  * Calculates the linear regression.
  * Uses to compute the best fit rssi value to base the volume off of. */
 - (void) calcAvgAndStream: (CLBeacon *) beacon
-               speakerNdx: (int) speakerNdx {
+               speakerNdx: (int) index {
     int setCount;
     
     // Check if beacon is SuperOmni
-    if (speakerNdx == self.superOmniNdx) {
+    if (index == self.superOmniNdx)
         setCount = self.superOmniDataPoints.count;
-    } else {
+    else
         setCount = self.smartThingsDataPoints.count;
-    }
     
     if (setCount == kSecondsToPollFor) {
         
@@ -200,7 +199,7 @@ int const kSmartThingsMajor = 1100;
         float calcRSSI = (answer.slope * beacon.accuracy) + answer.intercept;
         
         // Clear one data to go again (allows for one second polling basically)
-        if (speakerNdx == self.smartThingsNdx) {
+        if (index == self.smartThingsNdx) {
             [self.smartThingsDataPoints removeObjectAtIndex:0];
             [self.smartLinearFit removeFirst];
         }
@@ -210,18 +209,18 @@ int const kSmartThingsMajor = 1100;
         }
         
         // Check and use the calculated rssi value to adjust the volume of that associated speaker
-        [self checkBeacon:beacon speakerNdx:speakerNdx avgRSSI:calcRSSI];
+        [self checkBeacon:beacon speakerNdx:index avgRSSI:calcRSSI];
         
     }
     // Store data and play starting at a calculated volume level  (from 0 to kSecondsToStart)
     else {
-        [self initSpeakerPlay:beacon speakerNdx:speakerNdx currentSec:setCount];
+        [self initSpeakerPlay:beacon speakerNdx:index currentSec:setCount];
     }
 }
 
 /* Helper method for handling the initial speaker starting on from 0 - k seconds. */
 - (void) initSpeakerPlay: (CLBeacon *) beacon
-              speakerNdx: (int) speakerNdx
+              speakerNdx: (int) index
               currentSec: (int) setCount {
     
     // Add a new data point with rssi value and dist
@@ -229,25 +228,32 @@ int const kSmartThingsMajor = 1100;
     temp.xValue = beacon.accuracy;
     temp.yValue = beacon.rssi;
     
-    if (speakerNdx == self.superOmniNdx) {
+    if (index == self.superOmniNdx) {
         [self.superOmniDataPoints addObject: temp];
         [self.superLinearFit addDataObject: temp];
     } else {
         [self.smartThingsDataPoints addObject: temp];
         [self.smartLinearFit addDataObject:temp];
         
-        // In the time interval of 0 to kSecondsToStart, use avg of all values up till then to start playing.
-        if (setCount == kSecondsToStart)
-        {
-            DataItem * currData;
-            int sum = 0;
-            for (int i = 0; i < kSecondsToStart; i++) {
-                currData = self.smartThingsDataPoints[i];
-                sum += temp.xValue;
-            }
-            float avg = sum / self.smartThingsDataPoints.count;
-            [self checkBeacon:beacon speakerNdx:self.smartThingsNdx avgRSSI:avg];
+        [self calcInitAvg:beacon currentSec:setCount speakerNdx:index];
+    }
+}
+
+/* Helper method for calculating the initial average rssi to use for initial speaker startup */
+- (void) calcInitAvg: (CLBeacon *) beacon
+          currentSec: (int) setCount
+          speakerNdx: (int) index {
+    // In the time interval of 0 to kSecondsToStart, use avg of all values up till then to start playing.
+    if (setCount == kSecondsToStart)
+    {
+        DataItem * currData;
+        int sum = 0;
+        for (int i = 0; i < kSecondsToStart; i++) {
+            currData = self.smartThingsDataPoints[i];
+            sum += currData.xValue;
         }
+        float avg = sum / self.smartThingsDataPoints.count;
+        [self checkBeacon:beacon speakerNdx:index avgRSSI:avg];
     }
 }
 
@@ -299,7 +305,7 @@ int const kSmartThingsMajor = 1100;
     [[HKWControlHandler sharedInstance] stop];
 }
 
-/* Starts the playing of the first mp3 file */
+/* Starts the playing of the first mp3 file embedded into project */
 - (void) playStreaming {
     NSString *bundleRoot = [[NSBundle mainBundle] bundlePath];
     NSArray *dirContents = [[NSFileManager defaultManager] contentsOfDirectoryAtPath:bundleRoot error:nil];
@@ -312,12 +318,16 @@ int const kSmartThingsMajor = 1100;
     [[HKWControlHandler sharedInstance] playCAF:assetURL songName:_music[0] resumeFlag:true];
 }
 
-/* Changes volume of superomni, based on beacon's rssi value.
- * Currently using hard coded values, could change once an algorithm is figured out...
+/* Changes volume of superomni, based on calculated rssi value from best fit line.
+ *
  * UPDATE: This is actually pretty unreliable. RSSI fluctuates very heavily and can be interfered with by very common things.
  * iBeacons should be used to sense just sense proximity as of right now.
- * UPDATE 2: After talking with Seonman and Kevin, doing linear interpolation and averaging out a set might be what we want. */
-- (int) changeVolumeBasedOnRSSI: (float) rssi { //(CLBeacon *) beacon {
+ *
+ * UPDATE 2: After talking with Seonman and Kevin, doing linear interpolation and averaging out a set might be what we want.
+ *
+ * UPDATE 3: Need to figure outhow to do something other than set ranges. Seems like there would be a better solution
+ */
+- (int) changeVolumeBasedOnRSSI: (float) rssi {
     
     // Realistically, can't go father than -88 approx.
     if (rssi < -80)
@@ -333,17 +343,6 @@ int const kSmartThingsMajor = 1100;
     
     return 0; // Unknown rssi
 }
-
-
-/* Linear interpolation helper method between two points, returns the estimated dist value at newDist
- - (float) lerpForNewDistance: (float) targetRssi
- pointA: (DataPoint *) pointA
- pointB: (DataPoint *) pointB {
- 
- float slope = (pointB.distValue - pointA.distValue) / (pointB.rssiValue - pointA.rssiValue) ;
- 
- return -(pointA.distValue + (targetRssi - pointA.rssiValue) * slope);
- }*/
 
 
 #pragma mark - UITableViewDataSource
