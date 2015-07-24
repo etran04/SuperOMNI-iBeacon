@@ -16,4 +16,7 @@ Currently the functionality of this application are:
 <br> 3) Implemented a linear regression algorithm. Current taking a set of k data points to calculate a more accurate rssi value to base the new volume off of. Polls for one second after, creating a new best fit line to approximate the next volume level. 
 
 Currently implementing and working on:
-<br>2) Figuring out what initial volume would be best to start at.
+<br>1) Figuring out what initial volume would be best to start at.
+<br>2) Need to figure out how to associated each iBeacon to a speaker, rather than hardcoding each iBeacon (UUID, major, minor) to a particular speaker name. 
+<br>3) Linear regression algorithm can still be spotty through depending on the environment we're in. 
+<br>4) In the first k seconds, we need to approximate the best volume to start playing at, rather than wait the entire k seconds. 
