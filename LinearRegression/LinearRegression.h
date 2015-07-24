@@ -15,6 +15,9 @@
 
 - (RegressionResult *)calculateRegression:(NSArray *)data;
 - (void)addDataObject:(DataItem *)data;
+- (void)removeFirst; 
+- (void)clearRange: (int)start
+          endRange: (int)end;
 - (void)clear;
 - (RegressionResult *)calculate;
 - (NSArray *)getArray;

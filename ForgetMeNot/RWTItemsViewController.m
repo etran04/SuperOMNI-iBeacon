@@ -55,10 +55,8 @@ int const kSecondsToPollFor = 5;
     
     [self loadItems];
     
-    // init array for smartTHingsRanges
+    // init array for smartThingsRanges
     self.smartThingsDataPoints = [[NSMutableArray alloc] initWithCapacity:kSecondsToPollFor];
-    
-    self.ratios = [[NSArray alloc] initWithObjects:[NSNumber numberWithFloat:0.2],[NSNumber numberWithFloat:0.3], [NSNumber numberWithFloat:0.3], [NSNumber numberWithFloat:0.2], nil];
     
     self.linearFit = [LinearRegression sharedInstance];
      
@@ -182,7 +180,7 @@ int const kSecondsToPollFor = 5;
     // If full, interpolates, and returns average (full if 5 ranges)
     if (self.smartThingsDataPoints.count == kSecondsToPollFor) {
         
-        /* weighted average over a set of five data points*/
+        /* weighted average over a set of five data points
         float sum = 0;
         DataItem * temp;
         for (int i = 1; i < self.smartThingsDataPoints.count-1; i++) {
@@ -192,25 +190,43 @@ int const kSecondsToPollFor = 5;
         float weightedAvg = sum / (self.smartThingsDataPoints.count - 2) ;
         NSLog(@"Weighted average is %f", weightedAvg);
         
-        [self checkBeacon:beacon speakerNdx:self.smartThingsNdx avgRSSI:weightedAvg];
+        [self checkBeacon:beacon speakerNdx:self.smartThingsNdx avgRSSI:weightedAvg];*/
         
         
         // remove everything from first half
-        for (int j = 0; j < self.smartThingsDataPoints.count / 2; j++)
-            [self.smartThingsDataPoints removeObjectAtIndex:j];
+        //for (int j = 0; j < self.smartThingsDataPoints.count / 2; j++)
+         //   [self.smartThingsDataPoints removeObjectAtIndex:j];
         
         
-        //RegressionResult *answer = [self.linearFit calculate];
-        //NSLog(@"CURRENT regression slope %f", answer.slope);
+        RegressionResult *answer = [self.linearFit calculate];
+        // Linear fit of the set of 5 data points...
+        //NSLog(@"y = (%f * x) + %f)", answer.slope, answer.intercept);
+        // Using this linear fit, we can plug in the current dist to figure out the rssi and play accordingly.
+        //NSLog(@"Current beacon accuracy %f", beacon.accuracy);
+        float calcRSSI = (answer.slope * beacon.accuracy) + answer.intercept;
+        //NSLog(@"calcDist is %f", calcDist);
+        
+        // remove the first half
+        //for (int j = 0; j < self.smartThingsDataPoints.count / 2; j++) {
+        //[self.smartThingsDataPoints removeObjectAtIndex:0];
+        //[self.linearFit removeFirst];
+        //NSLog(@"Finished removing");
+        //}
+        
+        [self.smartThingsDataPoints removeAllObjects];
+        [self.linearFit clear];
+        
+        [self checkBeacon:beacon speakerNdx:self.smartThingsNdx avgRSSI:calcRSSI];
+
         
     } else {
         // add a new data point with rssi value and dist
-        // NSLog(@"Added new dataPoint");
+        NSLog(@"Added new dataPoint with rssi: %ld accuracy: %f", (long)beacon.rssi, beacon.accuracy);
         DataItem * temp = [DataItem new];
-        temp.xValue = -beacon.rssi;
-        temp.yValue = beacon.accuracy;
+        temp.xValue = beacon.accuracy;
+        temp.yValue = beacon.rssi;
         [self.smartThingsDataPoints addObject: temp];
-        //[self.linearFit addDataObject:temp];
+        [self.linearFit addDataObject:temp];
     }
 
     
@@ -225,7 +241,7 @@ int const kSecondsToPollFor = 5;
     
     // If the beacon is 'Near' or 'Immediate'(ly) close, play music on that speaker and adjust the volume if we move around.
     if (beacon.proximity == CLProximityNear || beacon.proximity == CLProximityImmediate) {
-        int volumeLvl = [self changeVolumeBasedOnRSSI:-rssi];
+        int volumeLvl = [self changeVolumeBasedOnRSSI:rssi];
         
         // If beacon correlates to superomni (omni10), add volume to make it louder
         if ([beacon.major intValue] == 1010)
