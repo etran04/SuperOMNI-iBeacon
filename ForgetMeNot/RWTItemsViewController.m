@@ -173,52 +173,23 @@ int const kSecondsToPollFor = 5;
     }
 }
 
+/* Create a new data point with the beacon rssi and accuracy value
+ * Stores into an array
+ * If full, calculates the linear regression and uses that in order to compute the best fit rssi value to base the volume off of. */
 - (void) calcAvgAndStream: (CLBeacon *) beacon {
-
-    // Create a new data point with the beacon rssi and accuracy value
-    // Stores into an array
-    // If full, interpolates, and returns average (full if 5 ranges)
+    
     if (self.smartThingsDataPoints.count == kSecondsToPollFor) {
         
-        /* weighted average over a set of five data points
-        float sum = 0;
-        DataItem * temp;
-        for (int i = 1; i < self.smartThingsDataPoints.count-1; i++) {
-            temp = self.smartThingsDataPoints[i];
-            sum += temp.xValue;
-        }
-        float weightedAvg = sum / (self.smartThingsDataPoints.count - 2) ;
-        NSLog(@"Weighted average is %f", weightedAvg);
-        
-        [self checkBeacon:beacon speakerNdx:self.smartThingsNdx avgRSSI:weightedAvg];*/
-        
-        
-        // remove everything from first half
-        //for (int j = 0; j < self.smartThingsDataPoints.count / 2; j++)
-         //   [self.smartThingsDataPoints removeObjectAtIndex:j];
-        
-        
         RegressionResult *answer = [self.linearFit calculate];
-        // Linear fit of the set of 5 data points...
-        //NSLog(@"y = (%f * x) + %f)", answer.slope, answer.intercept);
+        // Linear fit of the set of  data points...
         // Using this linear fit, we can plug in the current dist to figure out the rssi and play accordingly.
-        //NSLog(@"Current beacon accuracy %f", beacon.accuracy);
         float calcRSSI = (answer.slope * beacon.accuracy) + answer.intercept;
-        //NSLog(@"calcDist is %f", calcDist);
         
-        // remove the first half
-        //for (int j = 0; j < self.smartThingsDataPoints.count / 2; j++) {
-        //[self.smartThingsDataPoints removeObjectAtIndex:0];
-        //[self.linearFit removeFirst];
-        //NSLog(@"Finished removing");
-        //}
-        
-        [self.smartThingsDataPoints removeAllObjects];
-        [self.linearFit clear];
+        // clear data to go again
+        [self.smartThingsDataPoints removeObjectAtIndex:0];
+        [self.linearFit removeFirst];
         
         [self checkBeacon:beacon speakerNdx:self.smartThingsNdx avgRSSI:calcRSSI];
-
-        
     } else {
         // add a new data point with rssi value and dist
         NSLog(@"Added new dataPoint with rssi: %ld accuracy: %f", (long)beacon.rssi, beacon.accuracy);
