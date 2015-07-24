@@ -60,7 +60,7 @@ int const kSmartThingsMajor = 1100;
     
     [self loadItems];
     
-    // init array for smartThingsRanges
+    // Init array for data points, and create instances of the linearFit calculators.
     self.superOmniDataPoints = [[NSMutableArray alloc] initWithCapacity:kSecondsToPollFor];
     self.smartThingsDataPoints = [[NSMutableArray alloc] initWithCapacity:kSecondsToPollFor];
     
@@ -186,7 +186,7 @@ int const kSmartThingsMajor = 1100;
                speakerNdx: (int) speakerNdx {
     int setCount;
     
-    // beacon is superOmni
+    // Check if beacon is SuperOmni
     if (speakerNdx == self.superOmniNdx) {
         setCount = self.superOmniDataPoints.count;
     } else {
@@ -195,11 +195,11 @@ int const kSmartThingsMajor = 1100;
     
     if (setCount == kSecondsToPollFor) {
         
-        // calculates the linear regression (best fit line with the set of data points)
+        // Calculates the linear regression (best fit line with the set of data points)
         RegressionResult *answer = [self.smartLinearFit calculate];
         float calcRSSI = (answer.slope * beacon.accuracy) + answer.intercept;
         
-        // clear one data to go again (allows for one second polling basically)
+        // Clear one data to go again (allows for one second polling basically)
         if (speakerNdx == self.smartThingsNdx) {
             [self.smartThingsDataPoints removeObjectAtIndex:0];
             [self.smartLinearFit removeFirst];
@@ -209,10 +209,12 @@ int const kSmartThingsMajor = 1100;
             [self.superLinearFit removeFirst];
         }
         
-        // check and use the calculated rssi value to adjust the volume of that associated speaker
+        // Check and use the calculated rssi value to adjust the volume of that associated speaker
         [self checkBeacon:beacon speakerNdx:speakerNdx avgRSSI:calcRSSI];
         
-    } else {
+    }
+    // Store data and play starting at a calculated volume level  (from 0 to kSecondsToStart)
+    else {
         [self initSpeakerPlay:beacon speakerNdx:speakerNdx currentSec:setCount];
     }
 }
@@ -222,7 +224,7 @@ int const kSmartThingsMajor = 1100;
               speakerNdx: (int) speakerNdx
               currentSec: (int) setCount {
     
-    // add a new data point with rssi value and dist
+    // Add a new data point with rssi value and dist
     DataItem * temp = [DataItem new];
     temp.xValue = beacon.accuracy;
     temp.yValue = beacon.rssi;
@@ -234,7 +236,7 @@ int const kSmartThingsMajor = 1100;
         [self.smartThingsDataPoints addObject: temp];
         [self.smartLinearFit addDataObject:temp];
         
-        // in the time interval of 0 to kSecondsToStart, use avg of all values up till then to start playing.
+        // In the time interval of 0 to kSecondsToStart, use avg of all values up till then to start playing.
         if (setCount == kSecondsToStart)
         {
             DataItem * currData;
@@ -247,7 +249,6 @@ int const kSmartThingsMajor = 1100;
             [self checkBeacon:beacon speakerNdx:self.smartThingsNdx avgRSSI:avg];
         }
     }
-    
 }
 
 /* Helper method for determining which speaker - beacon is interacting and acts accordingly */
