@@ -7,10 +7,10 @@ WORK IN PROGRESS
 (Written in Objective C in this moment in time)
 
 Terms used: 
-<br>SuperOmni - Omni 10 with embedded iBeacon
-<br>SmartThings - Omni 20 with RFDuino acting as iBeacon beside it
+<br>SuperOmni - Omni 10 with embedded iBeacon (Major: 1010, Minor: 1)
+<br>SmartThings - Omni 20 with RFDuino acting as iBeacon beside it (Major: 1100, Minor: 1) 
 
-Almost all of iBeacon functionality with HK speakers are written in RWTItemViewController.m! 
+Almost all of iBeacon functionality with HK speakers are written in RWTItemsViewController.m.
 
 Currently the functionality of this application are:
 <br> 1) Able to start wake up from sleep and start playing music when in 'Near' or 'Immediate' vicinity of either speakers. 
@@ -22,3 +22,11 @@ Currently implementing and working on:
 <br>2) Need to figure out how to associated each iBeacon to a speaker, rather than hardcoding each iBeacon (UUID, major, minor) to a particular speaker name. 
 <br>3) Linear regression algorithm can still be spotty through depending on the environment we're in. 
 <br>4) In the first k seconds, we need to approximate the best volume to start playing at, rather than wait the entire k seconds. 
+
+HOW TO USE
+-----------
+<br> 1) Turn on iOS app 'SuperOMNI'
+<br> 2) Walk into "Near" or "Immediate" vicinity
+<br> 3) Wait approximately k seconds until song starts playing
+
+<br> After that, you should be able to walk around and volume should change accordingly. 
