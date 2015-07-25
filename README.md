@@ -41,4 +41,10 @@ If it is named "SuperOmni", it has to have Harman's UUID, Major: 1010, and Minor
 If it is named "SmartThings", it has to have Harman's UUID, Major: 1100, and Minor: 1. 
 
 Q. How do I name my speaker? 
-<p>Use the HK page app to name them. (only need to do this if you're connecting the speaker to a new network ) 
+<p>Use the HK page app to name them. (only need to do this if you're connecting the speaker to a new network) This is critical due to the fact that the code is hard coded to look for speakers with the names specified. 
+
+On the page app, you should be able to go to the speaker info and change the speaker name. (not to be confused with speaker room) You could set both to be safe if you want. 
+
+DISCLAIMER
+-----------
+There is an issue with geting the app to run on iPhone 4 and 4s. I haven't gotten to it yet. 
