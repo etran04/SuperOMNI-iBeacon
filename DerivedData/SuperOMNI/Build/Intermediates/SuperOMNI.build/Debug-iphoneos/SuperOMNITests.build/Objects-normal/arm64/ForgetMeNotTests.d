@@ -1,5 +1,5 @@
 dependencies: \
-  /Users/Eric/Desktop/SuperOMNI-Project/ForgetMeNotTests/ForgetMeNotTests.m \
+  /Users/Eric/Desktop/SuperOMNI-iBeacon/ForgetMeNotTests/ForgetMeNotTests.m \
   /Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/Library/Frameworks/XCTest.framework/Headers/XCTestSuiteRun.h \
   /Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/Library/Frameworks/XCTest.framework/Headers/XCTestSuite.h \
   /Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/Library/Frameworks/XCTest.framework/Headers/XCTestProbe.h \

@@ -194,8 +194,14 @@ int const kSmartThingsMajor = 1100;
     
     if (setCount == kSecondsToPollFor) {
         
+        RegressionResult *answer;
+        
         // Calculates the linear regression (best fit line with the set of data points)
-        RegressionResult *answer = [self.smartLinearFit calculate];
+        if (index == self.superOmniNdx)
+            answer = [self.superLinearFit calculate];
+        else
+            answer = [self.smartLinearFit calculate];
+        
         float calcRSSI = (answer.slope * beacon.accuracy) + answer.intercept;
         
         // Clear one data to go again (allows for one second polling basically)

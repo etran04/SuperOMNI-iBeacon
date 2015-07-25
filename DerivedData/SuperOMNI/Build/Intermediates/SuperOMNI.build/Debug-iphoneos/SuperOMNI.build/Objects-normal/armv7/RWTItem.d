@@ -1,2 +1,2 @@
-dependencies: /Users/Eric/Desktop/SuperOMNI-Project/ForgetMeNot/RWTItem.m \
-  /Users/Eric/Desktop/SuperOMNI-Project/ForgetMeNot/RWTItem.h
+dependencies: /Users/Eric/Desktop/SuperOMNI-iBeacon/ForgetMeNot/RWTItem.m \
+  /Users/Eric/Desktop/SuperOMNI-iBeacon/ForgetMeNot/RWTItem.h
