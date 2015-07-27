@@ -29,6 +29,8 @@ int const kSmartThingsMajor = 1100;
 @interface RWTItemsViewController () <UITableViewDataSource, UITableViewDelegate, CLLocationManagerDelegate>
 
 @property (weak, nonatomic) IBOutlet UITableView *itemsTableView;
+
+@property (strong, nonatomic) HKWControlHandler *HKWControl;
 @property (strong, nonatomic) NSMutableArray *items;
 @property (strong, nonatomic) CLLocationManager *locationManager;
 @property (strong, nonatomic) NSArray *music;
@@ -36,6 +38,7 @@ int const kSmartThingsMajor = 1100;
 @property (strong, nonatomic) NSMutableArray *superOmniDataPoints;
 @property (strong, nonatomic) LinearRegression * superLinearFit;
 @property (strong, nonatomic) LinearRegression * smartLinearFit;
+
 @property int superOmniNdx;
 @property int smartThingsNdx;
 
@@ -55,7 +58,9 @@ int const kSmartThingsMajor = 1100;
     
     self.superOmniNdx = self.smartThingsNdx = -1;
     [self searchBeacons];
-    [[HKWControlHandler sharedInstance] setVolumeAll: 0];
+    
+    self.HKWControl = [HKWControlHandler sharedInstance];
+    [self.HKWControl setVolumeAll: 0];
     
     [self loadItems];
     
@@ -73,14 +78,14 @@ int const kSmartThingsMajor = 1100;
  * Currently hardcoded to look for speakers named "SuperOmni" and "SmartThings"
  */
 - (void) searchBeacons {
-    for (int i = 0; i < [[HKWControlHandler sharedInstance] getDeviceCount]; i++) {
-        DeviceInfo * dInfo = [[HKWControlHandler sharedInstance] getDeviceInfoByIndex:i];
+    for (int i = 0; i < [self.HKWControl getDeviceCount]; i++) {
+        DeviceInfo * dInfo = [self.HKWControl getDeviceInfoByIndex:i];
         if ([dInfo.deviceName isEqual: @"SuperOmni"])
             self.superOmniNdx = i;
         else if ([dInfo.deviceName isEqual: @"SmartThings"])
             self.smartThingsNdx = i;
         else
-            [[HKWControlHandler sharedInstance] removeDeviceFromSession: dInfo.deviceId];
+            [self.HKWControl removeDeviceFromSession: dInfo.deviceId];
     }
 }
 
@@ -227,14 +232,14 @@ int const kSmartThingsMajor = 1100;
     
 }
 
-/* Helper method for handling the initial speaker starting on from 0 - k seconds. */
+/* Helper method for handling the initial speaker starting on from 0 - kSecondstoStart */
 - (void) initSpeakerPlay: (CLBeacon *) beacon
               speakerNdx: (int) index
               currentSec: (int) setCount {
     
     // Add a new data point with rssi value and dist
     DataItem * temp = [DataItem new];
-    temp.xValue = beacon.accuracy;
+    temp.xValue = beacon.accuracy; // accuracy = Apple's estimation of distance to iBeacon
     temp.yValue = beacon.rssi;
     
     if (index == self.superOmniNdx) {
@@ -259,7 +264,7 @@ int const kSmartThingsMajor = 1100;
           speakerNdx: (int) index
       dataPointArray: (NSMutableArray *) data {
     
-    // In the time interval of 0 to kSecondsToStart, use avg of all values up till then to start playing.
+    // In the time interval of 0 to kSecondsToStart, use avg of all values up till then to start playing volume at.
     if (setCount == kSecondsToStart)
     {
         DataItem * currData;
@@ -278,21 +283,19 @@ int const kSmartThingsMajor = 1100;
           speakerNdx: (int)index
              avgRSSI: (float)rssi {
     
-    HKWControlHandler *temp = [HKWControlHandler sharedInstance];
-    
     // If the beacon is 'Near' or 'Immediate'(ly) close, play music on that speaker and adjust the volume if we move around.
     if (beacon.proximity == CLProximityNear || beacon.proximity == CLProximityImmediate) {
         
         int volumeLvl = [self changeVolumeBasedOnRSSI:rssi];
-        [temp setVolumeDevice:[temp getDeviceInfoByIndex:index].deviceId volume:volumeLvl];
+        [self.HKWControl setVolumeDevice:[self.HKWControl getDeviceInfoByIndex:index].deviceId volume:volumeLvl];
         
         // If song isn't playing start playing it
-        if (![temp isPlaying])
+        if (![self.HKWControl isPlaying])
             [self playStreaming];
     }
     // If beacon is 'Far' or 'Unknown' (out of reach), turn down the volume of that speaker to 0
     else
-        [temp setVolumeDevice:[temp getDeviceInfoByIndex:index].deviceId volume:0];
+        [self.HKWControl setVolumeDevice:[self.HKWControl getDeviceInfoByIndex:index].deviceId volume:0];
     
 }
 
@@ -312,7 +315,6 @@ int const kSmartThingsMajor = 1100;
     notification.alertBody = @"Just left a beacon region";
     notification.soundName = @"Default";
     [[UIApplication sharedApplication] presentLocalNotificationNow:notification];
-    [[HKWControlHandler sharedInstance] stop];
 }
 
 /* Starts the playing of the first mp3 file embedded into project */
@@ -325,7 +327,7 @@ int const kSmartThingsMajor = 1100;
     NSURL *assetURL = [NSURL fileURLWithPath: [bundleRoot stringByAppendingPathComponent: _music[0]]];
     NSLog(@"NSURL: %@", assetURL);
     
-    [[HKWControlHandler sharedInstance] playCAF:assetURL songName:_music[0] resumeFlag:true];
+    [self.HKWControl playCAF:assetURL songName:_music[0] resumeFlag:true];
 }
 
 /* Changes volume of superomni, based on calculated rssi value from best fit line.
