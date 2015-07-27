@@ -45,6 +45,10 @@ Q. How do I name my speaker?
 
 On the page app, you should be able to go to the speaker info and change the speaker name. (not to be confused with speaker room) You could set both to be safe if you want. 
 
+Q. I got error "PCH was compiled with module cache path". How do I fix it?
+<p> My solution is to delete the 'Derived Data' project in the folder, and do a fresh clean build, then compile. 
+
+
 DISCLAIMER
 -----------
 There is an issue with geting the app to run on iPhone 4 and 4s. I haven't gotten to it yet. 
