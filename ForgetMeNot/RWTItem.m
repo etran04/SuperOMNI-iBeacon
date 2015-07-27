@@ -66,18 +66,4 @@ static NSString * const kRWTItemMinorValueKey = @"minor";
         return NO;
     }
 }
-
-- (BOOL)isEqualToSpecific:(NSString *)uuid
-                 majorVal:(NSString *)majorVal
-                 minorVal:(NSString *)minorVal {
-    if ([uuid isEqualToString:[self.uuid UUIDString]] &&
-        [majorVal isEqual: @(self.majorValue)] &&
-        [minorVal isEqual: @(self.minorValue)])
-    {
-        return YES;
-    } else {
-        return NO;
-    }
-}
-
 @end

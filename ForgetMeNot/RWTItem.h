@@ -29,9 +29,4 @@ static NSString * const HarmanUUID = @"5D3758EC-4C01-4C38-A1BF-69A1536E3513";
 /* Compares a CLBeacon instance with an RWTItem instance to see if they are equal. (If all identifiers match) */
 - (BOOL)isEqualToCLBeacon:(CLBeacon *)beacon;
 
-- (BOOL)isEqualToSpecific:(NSString *) uuid
-                    majorVal:(NSString *) majorVal
-                    minorVal:(NSString *) minorVal;
-
-
 @end

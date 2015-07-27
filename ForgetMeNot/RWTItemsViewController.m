@@ -32,12 +32,12 @@ int const kSmartThingsMajor = 1100;
 @property (strong, nonatomic) NSMutableArray *items;
 @property (strong, nonatomic) CLLocationManager *locationManager;
 @property (strong, nonatomic) NSArray *music;
-@property int superOmniNdx;
-@property int smartThingsNdx;
 @property (strong, nonatomic) NSMutableArray *smartThingsDataPoints;
 @property (strong, nonatomic) NSMutableArray *superOmniDataPoints;
 @property (strong, nonatomic) LinearRegression * superLinearFit;
 @property (strong, nonatomic) LinearRegression * smartLinearFit;
+@property int superOmniNdx;
+@property int smartThingsNdx;
 
 @end
 
