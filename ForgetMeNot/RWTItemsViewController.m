@@ -36,7 +36,6 @@ int const kSmartThingsMajor = 1100;
 @property int smartThingsNdx;
 @property (strong, nonatomic) NSMutableArray *smartThingsDataPoints;
 @property (strong, nonatomic) NSMutableArray *superOmniDataPoints;
-@property (strong, nonatomic) NSArray *ratios;
 @property (strong, nonatomic) LinearRegression * superLinearFit;
 @property (strong, nonatomic) LinearRegression * smartLinearFit;
 
@@ -192,36 +191,40 @@ int const kSmartThingsMajor = 1100;
     else
         setCount = self.smartThingsDataPoints.count;
     
-    if (setCount == kSecondsToPollFor) {
-        
-        RegressionResult *answer;
-        
-        // Calculates the linear regression (best fit line with the set of data points)
-        if (index == self.superOmniNdx)
-            answer = [self.superLinearFit calculate];
-        else
-            answer = [self.smartLinearFit calculate];
-        
-        float calcRSSI = (answer.slope * beacon.accuracy) + answer.intercept;
-        
-        // Clear one data to go again (allows for one second polling basically)
-        if (index == self.smartThingsNdx) {
-            [self.smartThingsDataPoints removeObjectAtIndex:0];
-            [self.smartLinearFit removeFirst];
-        }
-        else {
-            [self.superOmniDataPoints removeObjectAtIndex:0];
-            [self.superLinearFit removeFirst];
-        }
-        
-        // Check and use the calculated rssi value to adjust the volume of that associated speaker
-        [self checkBeacon:beacon speakerNdx:index avgRSSI:calcRSSI];
-        
-    }
-    // Store data and play starting at a calculated volume level  (from 0 to kSecondsToStart)
-    else {
+    // Has full data set to calculate regression line
+    // ... or needs more data point (from 0 to kSecondsToStart)
+    if (setCount == kSecondsToPollFor)
+        [self calculateRegressionLine:index currentBeacon:beacon];
+    else
         [self initSpeakerPlay:beacon speakerNdx:index currentSec:setCount];
+}
+
+/* Helper method for handling when a speaker has gathered enough data points.
+ * Starts calculating the linear regression line, uses that to base the volume off of */
+- (void) calculateRegressionLine: (int) index
+                   currentBeacon: (CLBeacon *) beacon {
+    
+    RegressionResult *answer;
+    
+    // Calculates the linear regression (best fit line with the set of data points)
+    // Then clears one data to go again (allows for one second polling basically)
+    if (index == self.superOmniNdx){
+        answer = [self.superLinearFit calculate];
+        [self.superOmniDataPoints removeObjectAtIndex:0];
+        [self.superLinearFit removeFirst];
     }
+    else {
+        answer = [self.smartLinearFit calculate];
+        [self.smartThingsDataPoints removeObjectAtIndex:0];
+        [self.smartLinearFit removeFirst];
+    }
+    
+    // Calculates the new rssi from the regression line
+    float calcRSSI = (answer.slope * beacon.accuracy) + answer.intercept;
+    
+    // Check and use the calculated rssi value to adjust the volume of that associated speaker
+    [self checkBeacon:beacon speakerNdx:index avgRSSI:calcRSSI];
+    
 }
 
 /* Helper method for handling the initial speaker starting on from 0 - k seconds. */
@@ -240,7 +243,7 @@ int const kSmartThingsMajor = 1100;
         
         // Check if in range of 0 - kSecondsToStart
         [self calcInitAvg:beacon currentSec:setCount speakerNdx:index dataPointArray:self.superOmniDataPoints];
-
+        
     } else {
         [self.smartThingsDataPoints addObject: temp];
         [self.smartLinearFit addDataObject:temp];
@@ -255,6 +258,7 @@ int const kSmartThingsMajor = 1100;
           currentSec: (int) setCount
           speakerNdx: (int) index
       dataPointArray: (NSMutableArray *) data {
+    
     // In the time interval of 0 to kSecondsToStart, use avg of all values up till then to start playing.
     if (setCount == kSecondsToStart)
     {
@@ -278,13 +282,8 @@ int const kSmartThingsMajor = 1100;
     
     // If the beacon is 'Near' or 'Immediate'(ly) close, play music on that speaker and adjust the volume if we move around.
     if (beacon.proximity == CLProximityNear || beacon.proximity == CLProximityImmediate) {
+        
         int volumeLvl = [self changeVolumeBasedOnRSSI:rssi];
-        
-        if ([beacon.major intValue] == kSmartThingsMajor) // Beacon is smartThings (Omni20), play more quiter
-            volumeLvl -= 6;
-        
-        
-        NSLog(@"Trying to set volume of %d to %d", index, volumeLvl);
         [temp setVolumeDevice:[temp getDeviceInfoByIndex:index].deviceId volume:volumeLvl];
         
         // If song isn't playing start playing it
