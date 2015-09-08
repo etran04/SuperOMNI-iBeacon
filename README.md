@@ -1,3 +1,3 @@
 #DEPRECATED
 ----------
-See [FollowMeAudio](/FollowMe) for a updated user friendly project in Swift. 
+See [FollowMeAudio](github.com/etran04/FollowMe) for a updated user friendly project in Swift. 
